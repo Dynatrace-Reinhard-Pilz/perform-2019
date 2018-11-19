@@ -1,4 +1,6 @@
 # hotday
 A small sample application
 ## Compiling
-Execute ```mvn clean package```
+* Executing ```mvn clean package``` will create the file ```hotday-1.0.0.jar``` within the subdirectory ```target```
+## Executing
+* Just run ```java - jar hotday-1.0.0.jar```
