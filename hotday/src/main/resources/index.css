@@ -1,0 +1,9 @@
+.healthy {
+	color: green;
+	font-weight: bold
+}
+
+.unhealthy {
+	color: red;
+	font-weight: bold
+}
