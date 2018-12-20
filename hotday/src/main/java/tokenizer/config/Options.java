@@ -52,13 +52,24 @@ public class Options implements Consumer<HttpURLConnection>{
 	}
 	
 	private String fetchPublicHostName() {
+		String host = null;
 		try {
-			return Http.get("http://169.254.169.254/latest/meta-data/public-hostname");
+			host = Http.get("http://169.254.169.254/latest/meta-data/public-hostname");
 		} catch (IOException e) {
 			// ignore
 			// outside EC2 that call won't work
-			return "localhost";
+			host = "";
 		}
+		if ("".equals(host)) {
+			try {
+				host = Http.get("http://169.254.169.254/latest/meta-data/public-ipv4");
+			} catch (IOException e) {
+				// ignore
+				// outside EC2 that call won't work
+				return "localhost";
+			}			
+		}
+		return host;
 	}
 
 	@Override

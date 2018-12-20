@@ -49,7 +49,7 @@ public final class LoadGenerator extends TimerTask implements CommandLineRunner 
 	@Override
 	public void run(String... args) throws Exception {
 		if (options.isFrontend()) {
-			timer.schedule(this, 0, 5000);
+			timer.schedule(this, 0, 1000);
 		}
 	}
 	

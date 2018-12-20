@@ -1,0 +1,172 @@
+{
+  "name": "custom.remote.python.hotday",
+  "version": "1.16",
+  "type": "python",
+  "entity": "CUSTOM_DEVICE",
+  "processTypeNames": ["PYTHON"],
+  "technologies": ["Apache Tomcat"],
+  "favicon": "https://styles.lab.dynatrace.org/assets/resources/icons/png/black/icons_technologies_002_BlackBox.png",
+  "source": {
+    "package": "hotday_activegate_plugin",
+    "className": "HOTDayPluginRemote",
+    "install_requires": ["requests>=2.6.0", "urllib"],
+    "activation": "Remote"
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "hotday.remote.jdbc.connections.idle",
+        "unit": "Count",
+        "displayname": "Idle Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections.idle"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "hotday.remote.jdbc.connections.pending",
+        "unit": "Count",
+        "displayname": "Pending Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections.pending"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "hotday.remote.jdbc.connections",
+        "unit": "Count",
+        "displayname": "Total Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections"
+      }
+    },    
+    {
+      "timeseries": {
+        "key": "hotday.remote.jdbc.connections.active",
+        "unit": "Count",
+        "displayname": "Active Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections.active"
+      },
+      "alert_settings": [
+        {
+          "alert_id": "custom_hotday_remote_high_jdbc_connections",
+          "event_type": "PERFORMANCE_EVENT",
+          "event_name": "High number of Active JDBC Connections",
+          "description": "The {metricname} of {severity} is {alert_condition} the threshold of {threshold}",
+          "threshold": 150.0,
+          "alert_condition": "ABOVE",
+          "samples":5,
+          "violating_samples":3,
+          "dealerting_samples":5
+        }
+      ] 
+    }    
+  ],
+  "ui": {
+    "keymetrics": [
+      {
+        "key": "hotday.remote.jdbc.connections",
+        "aggregation": "Sum",
+        "displayname": "Connections"
+      },
+      {
+        "key": "hotday.remote.jdbc.connections.active",
+        "aggregation": "Sum",
+        "displayname": "Active"
+      },
+      {
+        "key": "hotday.remote.jdbc.connections.idle",
+        "aggregation": "Sum",
+        "displayname": "Idle"
+      },
+      {
+        "key": "hotday.remote.jdbc.connections.pending",
+        "aggregation": "Sum",
+        "displayname": "Pending"
+      }
+    ],
+    "keycharts": [
+      {
+        "group": "JDBC Connections",
+        "title": "Connection",
+        "series": [
+          {
+            "key": "hotday.remote.jdbc.connections",
+            "aggregation": "Sum",
+            "displayname": "Connections",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "JDBC Connections",
+        "title": "Active Connection",
+        "series": [
+          {
+            "key": "hotday.remote.jdbc.connections.active",
+            "aggregation": "Sum",
+            "displayname": "Active Connections",
+            "seriestype": "area"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "group": "JDBC Connections",
+        "title": "JDBC Connections",
+        "series": [
+          {
+            "key": "hotday.remote.jdbc.connections",
+            "aggregation": "Sum",
+            "displayname": "Connections",
+            "seriestype": "area"
+          },
+          {
+            "key": "hotday.remote.jdbc.connections.active",
+            "aggregation": "Sum",
+            "displayname": "Active Connections",
+            "seriestype": "area"
+          },
+          {
+            "key": "hotday.remote.jdbc.connections.idle",
+            "aggregation": "Sum",
+            "displayname": "Idle Connections",
+            "seriestype": "area"
+          },
+          {
+            "key": "hotday.remote.jdbc.connections.pending",
+            "aggregation": "Sum",
+            "displayname": "Active Connections",
+            "seriestype": "area"
+          }
+        ]
+      }
+    ]    
+  },  
+  "properties" : [
+    {
+      "key" : "url",
+      "type" :  "String"
+    }
+  ],
+  "configUI": {
+    "displayName": "HOT Day ActiveGate Plugin",
+    "properties": [
+      {
+        "key" : "url",
+        "displayName" :  "URL",
+        "displayHint": "http://localhost:8080"
+      }
+    ]
+  }
+}

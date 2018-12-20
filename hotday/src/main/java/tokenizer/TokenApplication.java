@@ -39,6 +39,11 @@ public class TokenApplication {
     }
     
     @Bean
+    public StabilityManager stability(ApplicationContext ctx) {
+    	return new StabilityManager();
+    }
+    
+    @Bean
     public DataSources dataSources(ApplicationContext ctx) {
     	return new DataSources(ctx);
     }
@@ -49,16 +54,16 @@ public class TokenApplication {
     	return DataSourceBuilder.create().type(DataSources.DataSource1.class).build();
     }
 
-//    @Bean
-//    @ConfigurationProperties(prefix = "spring.datasource2")
-//    public DataSources.DataSource2 dataSource2() {
-//    	return DataSourceBuilder.create().type(DataSources.DataSource2.class).build();
-//    }
-//
-//    @Bean
-//    @ConfigurationProperties(prefix = "spring.datasource3")
-//    public DataSources.DataSource3 dataSource3() {
-//    	return DataSourceBuilder.create().type(DataSources.DataSource3.class).build();
-//    }
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource2")
+    public DataSources.DataSource2 dataSource2() {
+    	return DataSourceBuilder.create().type(DataSources.DataSource2.class).build();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource3")
+    public DataSources.DataSource3 dataSource3() {
+    	return DataSourceBuilder.create().type(DataSources.DataSource3.class).build();
+    }
     
 }

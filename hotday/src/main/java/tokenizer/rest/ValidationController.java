@@ -48,8 +48,8 @@ public class ValidationController implements ThreadFactory {
 			} catch (Throwable t) {
 				LOGGER.warn("invalid listen port '" + sListenPort + "'. Using '" + options.listenPort() + "' as fallback");
 			}
-		} else {
-			LOGGER.warn("missing listen port. Using '" + options.listenPort() + "' as fallback");
+//		} else {
+//			LOGGER.warn("missing listen port. Using '" + options.listenPort() + "' as fallback");
 		}
 		return listenPort;
 	}
@@ -57,6 +57,7 @@ public class ValidationController implements ThreadFactory {
 	@RequestMapping("/validate")
 	public ResponseEntity<String> validate(final HttpServletRequest req, HttpServletResponse res) throws IOException {
 		LOGGER.info("Received /validate request");
+		
 		final String dynatrace = req.getHeader("X-dynaTrace");
 		String remoteHost = req.getRemoteHost();
 		ResponseEntity<String> response = request(req, res);
