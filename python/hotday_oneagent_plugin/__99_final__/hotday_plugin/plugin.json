@@ -1,0 +1,171 @@
+{
+  "name": "custom.python.hotday",
+  "version": "1.4",
+  "type": "python",
+  "favicon": "https://styles.lab.dynatrace.org/assets/resources/icons/png/black/icons_technologies_002_BlackBox.png",
+  "entity": "PROCESS_GROUP_INSTANCE",
+  "processTypeNames": [ "JAVA"],
+  "source": {
+      "package": "hotday_plugin",
+      "className": "HOTDayPlugin",
+      "install_requires": ["requests>=2.6.0"],
+      "activation": "Singleton"
+  },
+  "metrics": [
+    {
+      "timeseries": {
+        "key": "hotday.jdbc.connections.idle",
+        "unit": "Count",
+        "displayname": "Idle Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections.idle"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "hotday.jdbc.connections.pending",
+        "unit": "Count",
+        "displayname": "Pending Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections.pending"
+      }
+    },
+    {
+      "timeseries": {
+        "key": "hotday.jdbc.connections",
+        "unit": "Count",
+        "displayname": "Total Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections"
+      }
+    },    
+    {
+      "timeseries": {
+        "key": "hotday.jdbc.connections.active",
+        "unit": "Count",
+        "displayname": "Active Connections",
+        "dimensions" : [ "pool" ]
+      },
+      "source": {
+        "key": "hikaricp.connections.active"
+      },
+      "alert_settings": [
+        {
+          "alert_id": "custom_hotday_high_jdbc_connections",
+          "event_type": "PERFORMANCE_EVENT",
+          "event_name": "High number of Active JDBC Connections",
+          "description": "The {metricname} of {severity} is {alert_condition} the threshold of {threshold}",
+          "threshold": 150.0,
+          "alert_condition": "ABOVE",
+          "samples":5,
+          "violating_samples":3,
+          "dealerting_samples":5
+        }
+      ]
+    }    
+  ],
+  "ui": {
+    "keymetrics": [
+      {
+        "key": "hotday.jdbc.connections",
+        "aggregation": "Sum",
+        "displayname": "Connections"
+      },
+      {
+        "key": "hotday.jdbc.connections.active",
+        "aggregation": "Sum",
+        "displayname": "Active"
+      },
+      {
+        "key": "hotday.jdbc.connections.idle",
+        "aggregation": "Sum",
+        "displayname": "Idle"
+      },
+      {
+        "key": "hotday.jdbc.connections.pending",
+        "aggregation": "Sum",
+        "displayname": "Pending"
+      }
+    ],
+    "keycharts": [
+      {
+        "group": "JDBC Connections",
+        "title": "Connection",
+        "series": [
+          {
+            "key": "hotday.jdbc.connections",
+            "aggregation": "Sum",
+            "displayname": "Connections",
+            "seriestype": "area"
+          }
+        ]
+      },
+      {
+        "group": "JDBC Connections",
+        "title": "Active Connection",
+        "series": [
+          {
+            "key": "hotday.jdbc.connections.active",
+            "aggregation": "Sum",
+            "displayname": "Active Connections",
+            "seriestype": "area"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "group": "JDBC Connections",
+        "title": "JDBC Connections",
+        "series": [
+          {
+            "key": "hotday.jdbc.connections",
+            "aggregation": "Sum",
+            "displayname": "Connections",
+            "seriestype": "area"
+          },
+          {
+            "key": "hotday.jdbc.connections.active",
+            "aggregation": "Sum",
+            "displayname": "Active Connections",
+            "seriestype": "area"
+          },
+          {
+            "key": "hotday.jdbc.connections.idle",
+            "aggregation": "Sum",
+            "displayname": "Idle Connections",
+            "seriestype": "area"
+          },
+          {
+            "key": "hotday.jdbc.connections.pending",
+            "aggregation": "Sum",
+            "displayname": "Pending Connections",
+            "seriestype": "area"
+          }
+        ]
+      }
+    ]    
+  },  
+  "properties" : [
+    {
+      "key" : "port",
+      "type" :  "INTEGER"
+    }
+  ],
+  "configUI": {
+    "displayName": "HOT Day Plugin",
+    "properties": [
+      {
+        "key" : "port",
+        "displayName" :  "port",
+        "displayHint": "8080"
+      }
+    ]
+  }
+}

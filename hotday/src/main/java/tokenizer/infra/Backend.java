@@ -54,7 +54,7 @@ public final class Backend {
 	
 	private String fetchBackendHostAndPort() {
 		try {
-			return Http.get(BACKEND_PUBLISH_LOCATION + "raw");
+			return Http.getraw(BACKEND_PUBLISH_LOCATION + "raw");
 		} catch (IOException e) {
 			LOGGER.warn("Unable to fetch backend host", e);
 			return null;

@@ -176,6 +176,27 @@ public final class Closeables {
 		}
 	}
 	
+	public static void copy(InputStream in, OutputStream out, int max) throws IOException {
+		if (in == null) {
+			return;
+		}
+		if (out == null) {
+			return;
+		}
+		byte[] buffer = new byte[4096];
+		int remaining = max;
+		int len = in.read(buffer, 0, Math.min(remaining, buffer.length));
+		while (len != -1) {
+			out.write(buffer, 0, len);
+			remaining -= len;
+			if (remaining == 0) {
+				break;
+			}
+			len = in.read(buffer);
+		}
+		out.flush();
+	}
+	
 	public static void copy(InputStream in, OutputStream out) throws IOException {
 		if (in == null) {
 			return;

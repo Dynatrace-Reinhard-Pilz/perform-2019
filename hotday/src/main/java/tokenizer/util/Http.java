@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class Http {
@@ -83,16 +84,73 @@ public final class Http {
 		try (OutputStream out = con.getOutputStream()) {
 			Closeables.copy(body, out);
 			Closeables.drain(con);
-		}	}
+		}
+	}
 	
-	public static void getraw(URL url) throws IOException {
+	public static String getraw(String url) throws IOException {
+		return getraw(new URL(Objects.requireNonNull(url)));
+	}
+	
+	public static String getraw(URL url) throws IOException {
 		try (Socket socket = Closeables.openSocket(url)) {
 			try (OutputStream out = socket.getOutputStream()) {
 				Closeables.println(out, GET + " " + Closeables.getPath(url) + " HTTP/1.1", "Host: " + url.getHost() + ":" + Closeables.getPort(url));
 				Closeables.println(out);
-				Closeables.readLine(socket);
+				
+				boolean isChunked = false;
+				try (InputStream in = socket.getInputStream()) {
+					String line = readLine(in);
+					while (line.length() > 0) {
+						if (line.startsWith("Transfer-Encoding: chunked")) {
+							isChunked = true;
+						}
+						line = readLine(in);	
+					}
+					
+					try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+						if (isChunked) {
+							int chars = readHex(in);
+							while (chars > 0) {
+								Closeables.copy(in, bout, chars);	
+								chars = readHex(in);
+							}
+						} else {
+							Closeables.copy(in, bout);
+						}
+						return new String(bout.toByteArray());
+					}
+				}
 			}
 		}
 	}
+	
+	private static int readHex(InputStream in) throws IOException {
+		String line = readLine(in);
+		if (line.trim().length() == 0) {
+			line = readLine(in);
+		}
+		return Integer.parseInt(line, 16);
+	}
+	
+	private static String readLine(InputStream in) throws IOException {
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			int read = in.read();
+			while (read != -1) {
+				if (read == '\r') {
+					// ignore
+				} else if (read == '\n') {
+					return new String(out.toByteArray());
+				} else {
+					out.write(read);					
+				}
+				read = in.read();
+			}
+			byte[] bytes = out.toByteArray();
+			if (bytes.length == 0) {
+				return null;
+			}
+			return new String(bytes);
+		}
+	}	
 
 }
