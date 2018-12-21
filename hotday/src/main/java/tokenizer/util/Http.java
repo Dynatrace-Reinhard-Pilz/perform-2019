@@ -98,11 +98,14 @@ public final class Http {
 				Closeables.println(out);
 				
 				boolean isChunked = false;
+				int contentLength = -1;
 				try (InputStream in = socket.getInputStream()) {
 					String line = readLine(in);
 					while (line.length() > 0) {
 						if (line.startsWith("Transfer-Encoding: chunked")) {
 							isChunked = true;
+						} else if (line.startsWith("Content-Length:")) {
+							contentLength = Integer.parseInt(line.substring("Content-Length:".length()).trim());
 						}
 						line = readLine(in);	
 					}
@@ -113,6 +116,13 @@ public final class Http {
 							while (chars > 0) {
 								Closeables.copy(in, bout, chars);	
 								chars = readHex(in);
+							}
+						} else if (contentLength != -1) {
+							if (contentLength == 0) {
+								return "";
+							} else {
+								Closeables.copy(in, bout, contentLength);
+								return new String(bout.toByteArray());
 							}
 						} else {
 							Closeables.copy(in, bout);

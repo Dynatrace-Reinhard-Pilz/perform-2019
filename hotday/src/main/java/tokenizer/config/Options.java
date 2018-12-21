@@ -1,7 +1,7 @@
 package tokenizer.config;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -21,13 +21,14 @@ public class Options implements Consumer<HttpURLConnection>{
 	public static final String HEADER_LISTEN_PORT = "X-Listen-Port";
 	
 	private final ApplicationContext ctx;
-	private final String fqdn;
+	private String fqdn = null;
+	private static final Object lock = new Object();
 	
 	public Options(ApplicationContext ctx) {
 		Objects.requireNonNull(ctx);
 		
 		this.ctx = ctx;
-		this.fqdn = fetchPublicHostName();
+//		this.fqdn = fetchPublicHostName();
 	}
 	
 	public ServiceMode mode() {
@@ -36,6 +37,12 @@ public class Options implements Consumer<HttpURLConnection>{
 	}
 	
 	public String fqdn() {
+		synchronized (lock) {
+			if (fqdn == null) {
+				fqdn = getFQDN();
+				LOGGER.info("FQDN: " + fqdn);
+			}
+		}
 		return fqdn;
 	}
 	
@@ -51,26 +58,41 @@ public class Options implements Consumer<HttpURLConnection>{
 		return Integer.parseInt(ctx.getEnvironment().getProperty("server.port"));
 	}
 	
-	private String fetchPublicHostName() {
-		String host = null;
+	public String getFQDN() {
 		try {
-			host = Http.get("http://169.254.169.254/latest/meta-data/public-hostname");
-		} catch (IOException e) {
-			// ignore
-			// outside EC2 that call won't work
-			host = "";
+			String echo = Http.get("https://postman-echo.com/ip");
+			int idx = echo.lastIndexOf('"');
+			echo = echo.substring(0, idx);
+			idx = echo.lastIndexOf('"');
+			echo = echo.substring(idx + 1);
+			InetAddress addr = InetAddress.getByName(echo);
+			echo = addr.getHostName();
+			return echo;
+		} catch (Throwable t) {
+			return null;
 		}
-		if ("".equals(host)) {
-			try {
-				host = Http.get("http://169.254.169.254/latest/meta-data/public-ipv4");
-			} catch (IOException e) {
-				// ignore
-				// outside EC2 that call won't work
-				return "localhost";
-			}			
-		}
-		return host;
 	}
+	
+//	private String fetchPublicHostName() {
+//		String host = null;
+//		try {
+//			host = Http.get("http://169.254.169.254/latest/meta-data/public-hostname");
+//		} catch (IOException e) {
+//			// ignore
+//			// outside EC2 that call won't work
+//			host = "";
+//		}
+//		if ("".equals(host)) {
+//			try {
+//				host = Http.get("http://169.254.169.254/latest/meta-data/public-ipv4");
+//			} catch (IOException e) {
+//				// ignore
+//				// outside EC2 that call won't work
+//				return "localhost";
+//			}			
+//		}
+//		return host;
+//	}
 
 	@Override
 	public void accept(HttpURLConnection con) {
