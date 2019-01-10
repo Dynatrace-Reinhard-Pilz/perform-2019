@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Wed Jan 09 18:31:13 CET 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-0168-33aa-f710-00002049e518 
+on database directory memory:C:\Users\Michael.Lundstrom\Desktop\Plugins\HOT\perform-2019\example1 with class loader org.springframework.boot.loader.LaunchedURLClassLoader@506c589e 
+Loaded from jar:file:/C:/Users/Michael.Lundstrom/Desktop/Plugins/HOT/perform-2019/tokenizer-1.0.0.jar!/BOOT-INF/lib/derby-10.14.1.0.jar!/
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_191-b12
+user.dir=C:\Users\Michael.Lundstrom\Desktop\Plugins\HOT\perform-2019
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

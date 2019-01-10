@@ -1,0 +1,18 @@
+{
+  "entries": [
+    {
+      "process_type": 10,
+      "group_name": "tokenizer-*.jar",
+      "group_instance_id": 1234567,
+      "processes": [
+        {
+          "process_name": "tokenizer-1.0.0.jar",
+          "properties": {
+            "CmdLine": "C:\\Program\\Files\\Java\\jre1.8.0_191\\bin\\javaw.exe -jar C:\\Users\\Michael.Lundstrom\\Desktop\\Plugins\\HOT\\perform-2019\\tokenizer-1.0.0.jar",
+            "Technologies": "JAVA"
+          }
+        }
+      ]
+    }
+  ]
+}

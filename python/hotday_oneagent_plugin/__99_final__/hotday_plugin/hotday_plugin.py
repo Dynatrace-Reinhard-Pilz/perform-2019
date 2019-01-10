@@ -1,35 +1,34 @@
-import json
-import requests
 from ruxit.api.base_plugin import BasePlugin
 from ruxit.api.snapshot import pgi_name
+import json
+import requests
 import logging
-import urllib.parse
-import socket
-from utils import URL
-from utils import HTTP
-from metrics import Measurement
-from metrics import MetricClient
 
 logger = logging.getLogger(__name__)
-request = HTTP()
 
 class HOTDayPlugin(BasePlugin):
-    def initialize(self, **kwargs):
-        config = kwargs['config']
-        self.port = int(config["port"])
-        json_config = kwargs["json_config"]
-        if "metrics" not in json_config:
-            self.metrics = None
-        self.metrics = json_config["metrics"]
-
     def query(self, **kwargs):
-        pgi = self.find_single_process_group(pgi_name("tokenizer-*.jar"))
-        pgi_id = pgi.group_instance_id
-        measurements = []
-        for metric in self.metrics:
-            client = MetricClient(URL("localhost", self.port), metric["timeseries"]["key"], metric["source"]["key"])
-            for measurement in client.get():
-                measurements.append(measurement)
-        for measurement in measurements:
-            logger.info("key: %s, value: %d" % (measurement.key, measurement.value))
-            self.results_builder.absolute(key=measurement.key, value=measurement.value, dimensions = measurement.dimensions, entity_id=pgi_id)
+        # Get the port from the properties
+        config = kwargs['config']
+        port = int(config["port"])
+        
+        # Get the metrics defined in the plugin.json
+        json_config = kwargs["json_config"]
+        metrics = json_config["metrics"]
+        
+        # Get the entity id
+        pgi_id = kwargs["associated_entity"].group_instance_id
+        
+        for metric in metrics:
+            # Poll the rest interface to get the metrics
+            result = requests.get("http://localhost:" + str(port) + "/actuator/metrics/" + metric["source"]["key"])
+            result_content = result.content.decode("utf-8")
+            result_json = json.loads(result_content)
+            # Response example: {"name":"hikaricp.connections.idle","description":"Idle connections","baseUnit":null,"measurements":[{"statistic":"VALUE","value":15.0}],"availableTags":[{"tag":"pool","values":["pool-c","pool-b","pool-a"]}]}
+            
+            value = result_json["measurements"][0]["value"]
+            tags = result_json["availableTags"]
+            for tag in tags:
+                tagName = tag["tag"]
+                for tagValue in tag["values"]:
+                    self.results_builder.absolute(key=metric["timeseries"]["key"], value=value, dimensions = {tagName:tagValue}, entity_id=pgi_id)

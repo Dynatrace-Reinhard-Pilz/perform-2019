@@ -1,15 +1,14 @@
 {
   "name": "custom.python.hotday",
-  "version": "1.4",
+  "version": "1.6",
   "type": "python",
-  "favicon": "https://styles.lab.dynatrace.org/assets/resources/icons/png/black/icons_technologies_002_BlackBox.png",
   "entity": "PROCESS_GROUP_INSTANCE",
-  "processTypeNames": [ "JAVA"],
+  "processTypeNames": ["JAVA"],
   "source": {
       "package": "hotday_plugin",
       "className": "HOTDayPlugin",
       "install_requires": ["requests>=2.6.0"],
-      "activation": "Singleton"
+      "activation": "SnapshotEntry"
   },
   "metrics": [
     {
