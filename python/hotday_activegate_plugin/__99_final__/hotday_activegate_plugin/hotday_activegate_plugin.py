@@ -12,6 +12,8 @@ from metrics import MetricClient
 logger = logging.getLogger(__name__)
 request = HTTP()
 
+# http://ec2-52-41-83-14.us-west-2.compute.amazonaws.com:8080
+
 class HOTDayPluginRemote(RemoteBasePlugin):
     def initialize(self, **kwargs):
         config = kwargs['config']
